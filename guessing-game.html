@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Juego de Adivinanza - Adivina el Número</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #050816 0%, #0d1b2a 100%);
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .game-container {
+            background: rgba(13, 27, 42, 0.8);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            box-shadow: 0 10px 40px rgba(30, 96, 145, 0.3);
+            border: 2px solid #1e6091;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e6091;
+            margin-bottom: 20px;
+            font-size: 2.5rem;
+        }
+
+        .game-info {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 1.2rem;
+        }
+
+        .input-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        input[type="number"] {
+            padding: 15px;
+            font-size: 1.2rem;
+            border: 2px solid #1e6091;
+            border-radius: 10px;
+            background: rgba(5, 8, 22, 0.6);
+            color: #ffffff;
+            text-align: center;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #1e6091;
+            box-shadow: 0 0 10px rgba(30, 96, 145, 0.5);
+        }
+
+        button {
+            padding: 15px 30px;
+            font-size: 1.2rem;
+            background: #1e6091;
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background: #2874a6;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(30, 96, 145, 0.4);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .message {
+            text-align: center;
+            font-size: 1.3rem;
+            margin-top: 20px;
+            min-height: 30px;
+            font-weight: 600;
+        }
+
+        .message.high {
+            color: #e74c3c;
+        }
+
+        .message.low {
+            color: #f39c12;
+        }
+
+        .message.correct {
+            color: #2ecc71;
+            font-size: 1.5rem;
+        }
+
+        .attempts {
+            text-align: center;
+            margin-top: 15px;
+            font-size: 1.1rem;
+            color: #1e6091;
+        }
+
+        .reset-btn {
+            margin-top: 20px;
+            background: #2ecc71;
+        }
+
+        .reset-btn:hover {
+            background: #27ae60;
+        }
+
+        .back-btn {
+            margin-top: 10px;
+            background: #7f8c8d;
+        }
+
+        .back-btn:hover {
+            background: #95a5a6;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1>🎯 Adivina el Número</h1>
+        <div class="game-info">
+            <p>Estoy pensando en un número entre 1 y 20</p>
+        </div>
+        
+        <div class="input-container">
+            <input type="number" id="guessInput" min="1" max="20" placeholder="Escribe un número..." autofocus>
+            <button id="guessBtn" onclick="checkGuess()">Adivinar</button>
+        </div>
+
+        <div class="message" id="message"></div>
+        <div class="attempts" id="attempts"></div>
+
+        <button class="reset-btn hidden" id="resetBtn" onclick="resetGame()">Jugar de Nuevo</button>
+        <button class="back-btn" onclick="goBack()">Volver al Portfolio</button>
+    </div>
+
+    <script>
+        let randomNumber;
+        let attemptCount = 0;
+        let gameOver = false;
+
+        // Inicializar el juego
+        function initGame() {
+            randomNumber = Math.floor(Math.random() * 20) + 1;
+            attemptCount = 0;
+            gameOver = false;
+            document.getElementById('message').textContent = '';
+            document.getElementById('attempts').textContent = '';
+            document.getElementById('guessInput').value = '';
+            document.getElementById('guessInput').disabled = false;
+            document.getElementById('guessBtn').disabled = false;
+            document.getElementById('resetBtn').classList.add('hidden');
+            console.log('Número secreto:', randomNumber); // Para pruebas
+        }
+
+        function checkGuess() {
+            if (gameOver) return;
+
+            const input = document.getElementById('guessInput');
+            const numero = parseInt(input.value);
+            const messageEl = document.getElementById('message');
+            const attemptsEl = document.getElementById('attempts');
+
+            // Validar entrada
+            if (isNaN(numero) || numero < 1 || numero > 20) {
+                messageEl.textContent = 'Por favor, escribe un número entre 1 y 20';
+                messageEl.className = 'message';
+                return;
+            }
+
+            attemptCount++;
+
+            if (numero < randomNumber) {
+                messageEl.textContent = 'Más alto';
+                messageEl.className = 'message low';
+            } else if (numero > randomNumber) {
+                messageEl.textContent = 'Más bajo';
+                messageEl.className = 'message high';
+            } else {
+                messageEl.textContent = `¡Correcto! El número era ${randomNumber}`;
+                messageEl.className = 'message correct';
+                gameOver = true;
+                document.getElementById('guessInput').disabled = true;
+                document.getElementById('guessBtn').disabled = true;
+                document.getElementById('resetBtn').classList.remove('hidden');
+            }
+
+            attemptsEl.textContent = `Intentos: ${attemptCount}`;
+            input.value = '';
+            input.focus();
+        }
+
+        function resetGame() {
+            initGame();
+        }
+
+        function goBack() {
+            window.location.href = 'index.html#portfolio';
+        }
+
+        // Permitir Enter para adivinar
+        document.getElementById('guessInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkGuess();
+            }
+        });
+
+        // Iniciar el juego cuando se carga la página
+        initGame();
+    </script>
+</body>
+</html>
